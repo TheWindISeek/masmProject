@@ -1,0 +1,110 @@
+Microsoft (R) Macro Assembler Version 6.11		    10/07/22 11:30:39
+tempfile.asm						     Page 1 - 1
+
+
+				assume cs:code
+
+ 0000				data segment
+ 0000  57 65 6C 63 6F 6D	    db 'Welcome to masm!', 0
+       65 20 74 6F 20 6D
+       61 73 6D 21 00
+ 0011				data ends
+
+ 0000				stack segment
+ 0000  0010 [			    db 16 dup(0)
+        00
+       ]
+ 0010				stack ends
+
+ 0000				code segment
+ 0000				start:
+ 0000  B6 08			    mov dh, 8
+ 0002  B2 03			    mov dl, 3
+ 0004  B1 02			    mov cl, 2
+ 0006  B8 ---- R		    mov ax, data
+ 0009  8E D8			    mov ds, ax
+ 000B  BE 0000			    mov si, 0
+ 000E  E8 0005			    call show_str
+
+ 0011  B8 4C00			    mov ax, 4c00h
+ 0014  CD 21			    int 21h
+
+ 0016				show_str:
+				    ;function: show a string with 0 in place (dh row, dl column) show color(cl)
+				    ;dh = row; dl = column; cl = color; ds:si = first address of string
+				    ;return void
+				    ;b800:0000 : 0 row
+				    ;00 - 01 : 0 column
+				    ;0a0h byte
+ 0016  06			    push es
+ 0017  56			    push si
+ 0018  52			    push dx
+ 0019  51			    push cx
+ 001A  53			    push bx
+ 001B  50			    push ax
+				    ;bias 
+ 001C  BB B800			    mov bx, 0b800h
+ 001F  8E C3			    mov es, bx
+ 0021  BB 0000			    mov bx, 0
+				    
+				    ;row; bx = dh * a0 + bx
+ 0024  B8 00A0			    mov ax, 00a0h
+ 0027  F6 E6			    mul dh
+ 0029  03 D8			    add bx, ax
+				    ;column; bx = dl * 2 + bx
+ 002B  B8 0002			    mov ax, 0002h
+ 002E  F6 E6			    mul dh
+ 0030  03 D8			    add bx, ax
+				    
+				    ;set string
+				    ;restore cx dx
+ 0032  8A C1			    mov al, cl
+ 0034				    string:
+ 0034  8A 0C			    mov cl, ds:[si];get char
+ 0036  B5 00			    mov ch, 0
+ 0038  E3 0B			    jcxz end_show_str; if zero jmp end_show_str
+ 003A  8A E8			    mov ch, al; set font 
+ 003C  26: 89 0F		    mov es:[bx], cx; set data
+
+				    ;move back
+ 003F  83 C3 02			    add bx, 2
+ 0042  46			    inc si
+ 0043  EB EF			    jmp short string
+
+				    ;return 
+ 0045				    end_show_str:
+ 0045  58			    pop ax
+ 0046  5B			    pop bx
+ 0047  59			    pop cx
+ 0048  5A			    pop dx
+ 0049  5E			    pop si
+ 004A  07			    pop es
+ 004B  C3			    ret
+ 004C				code ends
+				end start
+Microsoft (R) Macro Assembler Version 6.11		    10/07/22 11:30:39
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+code . . . . . . . . . . . . . .	16 Bit	 004C	  Para	  Private 
+data . . . . . . . . . . . . . .	16 Bit	 0011	  Para	  Private 
+stack  . . . . . . . . . . . . .	16 Bit	 0010	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+end_show_str . . . . . . . . . .	L Near	 0045	  code	
+show_str . . . . . . . . . . . .	L Near	 0016	  code	
+start  . . . . . . . . . . . . .	L Near	 0000	  code	
+string . . . . . . . . . . . . .	L Near	 0034	  code	
+
+	   0 Warnings
+	   0 Errors

@@ -1,0 +1,95 @@
+Microsoft (R) Macro Assembler Version 6.11		    09/14/22 21:33:27
+tempfile.asm						     Page 1 - 1
+
+
+ 0000				DATAS SEGMENT
+ 0000 48 65 6C 6C 6F 24		    HELLO byte 'Hello$'
+ 0006 57 6F 72 6C 64 24		    WORLD byte 'World$'
+ 000C  0014 [			    db 20 dup(0)
+        00
+       ]
+ 0020				DATAS ENDS
+
+ 0000				STACKS SEGMENT
+ 0000  0014 [			    db 20 dup(0)
+        00
+       ]
+ 0014				STACKS ENDS
+
+ 0000				CODES SEGMENT
+				    ASSUME CS:CODES,DS:DATAS,SS:STACKS
+ 0000				START:
+				    ;显示设置ds寄存器和ss寄存器
+ 0000  B8 ---- R		    MOV AX,DATAS
+ 0003  8E D8			    MOV DS,AX
+				    
+ 0005  B8 ---- R		    mov ax, stacks
+ 0008  8E D0			    mov ss, ax
+				    
+				    ;业务逻辑代码
+				    ;从这里开始调用函数 sum 将两个形参入栈
+ 000A  B8 0003			    mov ax, 0003h
+ 000D  50			    push ax
+ 000E  B8 0004			    mov ax, 0004h
+ 0011  50			    push ax
+ 0012  E8 0004			    call sum
+				    ;退出程序
+ 0015  B4 4C			    mov ah, 4ch
+ 0017  CD 21			    int 21h
+				    ;入口参数 出口参数 出口参数会放在哪里？
+				    ;功能函数
+ 0019				    sum:
+				    ;用bp指针记录调用前sp指针的值
+ 0019  8B EC			    mov bp, sp
+				    
+				    ;为函数开辟局部变量的空间
+ 001B  83 EC 20			    sub sp, 20H
+				    
+				    ;定义局部变量 c = 1, d = 2
+ 001E  C6 46 FE 01		    mov byte ptr ss:[bp - 2], 0001h
+ 0022  C6 46 FC 02		    mov byte ptr ss:[bp - 4], 0002h
+				    
+				    ;执行a + b + c + d
+ 0026  8B 46 04			    mov ax, ss:[bp + 0004h]
+ 0029  03 46 02			    add ax, ss:[bp + 0002h]
+ 002C  03 46 FE			    add ax, ss:[bp - 0002h]
+ 002F  03 46 FC			    add ax, ss:[bp - 0004h]
+				    
+				    ;恢复sp指针的位置 清空函数内部局部变量
+ 0032  8B E5			    mov sp, bp
+				    
+ 0034  C2 0004			    ret 4
+ 0037  B4 4C			    MOV AH,4CH
+ 0039  CD 21			    INT 21H
+ 003B				CODES ENDS
+				    END START
+
+
+
+
+Microsoft (R) Macro Assembler Version 6.11		    09/14/22 21:33:27
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+CODES  . . . . . . . . . . . . .	16 Bit	 003B	  Para	  Private 
+DATAS  . . . . . . . . . . . . .	16 Bit	 0020	  Para	  Private 
+STACKS . . . . . . . . . . . . .	16 Bit	 0014	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+HELLO  . . . . . . . . . . . . .	Byte	 0000	  DATAS	
+START  . . . . . . . . . . . . .	L Near	 0000	  CODES	
+WORLD  . . . . . . . . . . . . .	Byte	 0006	  DATAS	
+sum  . . . . . . . . . . . . . .	L Near	 0019	  CODES	
+
+	   0 Warnings
+	   0 Errors

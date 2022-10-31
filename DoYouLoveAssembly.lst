@@ -1,0 +1,142 @@
+Microsoft (R) Macro Assembler Version 6.11		    10/06/22 22:31:54
+tempfile.asm						     Page 1 - 1
+
+
+				assume cs:code, ds:data
+
+ 0000				data segment
+ 0000 61 6C 74 65 72 20		    masm db 'alter memory block b800:848 to welcome to masm!'
+       6D 65 6D 6F 72 79
+       20 62 6C 6F 63 6B
+       20 62 38 30 30 3A
+       38 34 38 20 74 6F
+       20 77 65 6C 63 6F
+       6D 65 20 74 6F 20
+       6D 61 73 6D 21
+ 002F 69 20 61 6C 73 6F		    say db 'i also want to say'
+       20 77 61 6E 74 20
+       74 6F 20 73 61 79
+ 0041 74 61 6C 6B 20 69		    programmer db 'talk is cheap show me the code'
+       73 20 63 68 65 61
+       70 20 73 68 6F 77
+       20 6D 65 20 74 68
+       65 20 63 6F 64 65
+ 005F 74 68 65 20 77 6F		    world db 'the world is yours'
+       72 6C 64 20 69 73
+       20 79 6F 75 72 73
+ 0071 24			    final db '$'
+ 0072				data ends
+
+ 0000				code segment 
+ 0000				start:
+				    ;alter memory block b800:848 to welcome to masm!
+				    ;i also want to say talk is cheap show me the code
+				    ;tomorrow is another day
+				    ;the world is yours
+				    ;
+ 0000  B8 ---- R		    mov ax, data
+ 0003  8E D8			    mov ds, ax
+
+ 0005  B8 B800			    mov ax, 0b800h
+ 0008  8E C0			    mov es, ax
+ 000A  BD 0012			    mov bp, 012h
+				    ;first string 
+ 000D  B9 002F			    mov cx, offset say - offset masm
+ 0010  BB 0000 R		    mov bx, offset masm
+ 0013  BA 00CA			    mov dx, 0cah;
+ 0016  E8 0034			    call output
+					
+ 0019  81 C5 00A0			add bp, 0a0h
+ 001D  B9 0012				mov cx, offset programmer - offset say
+ 0020  BB 002F R			mov bx, offset say
+ 0023  B2 04				mov dl, 04h
+ 0025  E8 0025				call output
+					
+ 0028  81 C5 00A0			add bp, 0a0h
+ 002C  B9 001E				mov cx, offset world - offset programmer
+ 002F  8D 1E 0041 R			lea bx, programmer
+ 0033  B2 24				mov dl, 24h
+ 0035  E8 0015				call output
+					
+ 0038  81 C5 0140			add bp, 140h
+ 003C  B9 0012				mov cx, offset final - offset world
+ 003F  8D 1E 0041 R			lea bx, programmer
+ 0043  B2 01				mov dl, 01h
+ 0045  E8 0005				call output
+					
+ 0048  B8 4C00			    mov ax, 4c00h
+ 004B  CD 21			    int 21h
+
+ 004D				    output proc
+				    ;cx = numbers of charters;
+				    ;bx = the first address of string;
+				    ;dx = font of charters;
+				    ;put in the ss:bp;
+ 004D  56			    push si
+ 004E  57			    push di
+ 004F  50			    push ax
+ 0050  53			    push bx
+ 0051  51			    push cx
+ 0052  52			    push dx
+				    
+ 0053  BE 0000			    mov si, 0
+ 0056  BF 0000			    mov di, 0
+ 0059				    outputString:
+				    ;first byte
+ 0059  8A 01			    mov al, [bx+di];
+ 005B  26: 88 02		    mov es:[bp+si], al;
+				    ;second byte used to set font
+ 005E  26: 88 52 01		    mov es:[bp+si+1], dl;
+ 0062  83 C6 02			    add si, 2
+ 0065  47			    inc di
+ 0066  E2 F1			    loop outputString
+				    
+ 0068  5A			    pop dx
+ 0069  59			    pop cx
+ 006A  5B			    pop bx
+ 006B  58			    pop ax
+ 006C  5F			    pop di
+ 006D  5E			    pop si
+ 006E  C3			    ret
+ 006F				    output endp
+ 006F				code ends
+				end start
+
+
+
+
+Microsoft (R) Macro Assembler Version 6.11		    10/06/22 22:31:54
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+code . . . . . . . . . . . . . .	16 Bit	 006F	  Para	  Private 
+data . . . . . . . . . . . . . .	16 Bit	 0072	  Para	  Private 
+
+
+Procedures,  parameters and locals:
+
+                N a m e                 Type     Value    Attr
+
+output . . . . . . . . . . . . .	P Near	 004D	  code	Length= 0022 Public
+  outputString . . . . . . . . .	L Near	 0059	  code	
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+final  . . . . . . . . . . . . .	Byte	 0071	  data	
+masm . . . . . . . . . . . . . .	Byte	 0000	  data	
+programmer . . . . . . . . . . .	Byte	 0041	  data	
+say  . . . . . . . . . . . . . .	Byte	 002F	  data	
+start  . . . . . . . . . . . . .	L Near	 0000	  code	
+world  . . . . . . . . . . . . .	Byte	 005F	  data	
+
+	   0 Warnings
+	   0 Errors

@@ -1,0 +1,62 @@
+Microsoft (R) Macro Assembler Version 6.11		    10/05/22 21:30:31
+tempfile.asm						     Page 1 - 1
+
+
+				assume cs:codesg, ds:datasg
+
+ 0000				datasg segment
+ 0000  42 61 53 69 43		    db 'BaSiC'
+ 0005  69 4E 66 4F 72 4D	    db 'iNfOrMaTiOn'
+       61 54 69 4F 6E
+ 0010				datasg ends
+
+ 0000				codesg segment
+ 0000  B8 ---- R		start:mov ax, datasg
+ 0003  8E D8			    mov ds, ax
+
+ 0005  BB 0000			    mov bx, 0
+
+ 0008  B9 0005			    mov cx, 5
+ 000B  8A 07			    s:mov al, [bx]
+ 000D  24 DF			    and al, 11011111B
+ 000F  88 07			    mov [bx], al
+ 0011  43			    inc bx
+ 0012  E2 F7			    loop s 
+
+ 0014  BB 0005			    mov bx, 5
+
+ 0017  B9 000B			    mov cx, 11
+ 001A  8A 07			    s0:mov al, [bx]
+ 001C  0C 20			    or al, 00100000B
+ 001E  88 07			    mov [bx], al
+ 0020  43			    inc bx
+ 0021  E2 F7			    loop s0
+
+ 0023  B4 4C			    mov ah, 4CH
+ 0025  CD 21			    int 21h
+ 0027				codesg ends
+				end start
+Microsoft (R) Macro Assembler Version 6.11		    10/05/22 21:30:31
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+codesg . . . . . . . . . . . . .	16 Bit	 0027	  Para	  Private 
+datasg . . . . . . . . . . . . .	16 Bit	 0010	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+s0 . . . . . . . . . . . . . . .	L Near	 001A	  codesg	
+start  . . . . . . . . . . . . .	L Near	 0000	  codesg	
+s  . . . . . . . . . . . . . . .	L Near	 000B	  codesg	
+
+	   0 Warnings
+	   0 Errors

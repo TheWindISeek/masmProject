@@ -1,0 +1,81 @@
+Microsoft (R) Macro Assembler Version 6.11		    09/19/22 15:47:39
+tempfile.asm						     Page 1 - 1
+
+
+ 0000				DATAS SEGMENT
+ 0000 0D 0A 24			    CRLF  db 13, 10, '$'
+ 0003  0004 [			    AREA  db 4 dup(0)
+        00
+       ]
+ 0007				DATAS ENDS
+
+ 0000				STACKS SEGMENT
+				    
+ 0000				STACKS ENDS
+
+ 0000				CODES SEGMENT
+				            ASSUME CS:CODES,DS:DATAS,SS:STACKS
+ 0000				    START:  
+ 0000  B8 ---- R		            MOV    AX,DATAS
+ 0003  8E D8			            MOV    DS,AX
+				   	
+ 0005  B8 0929			            mov    ax, 2345
+ 0008  8D 1E 0003 R		            lea    bx, CS:AREA
+ 000C  BE 0001			            mov    si, 1
+ 000F  B2 0A			            mov    dl, 10
+				            
+ 0011  F6 F2			            div    dl
+ 0013  88 27			            mov    [bx], ah
+ 0015				    divLoop:
+ 0015  B4 00			            mov    ah, 0
+ 0017  F6 F2			            div    dl
+
+ 0019  88 20			            mov    [bx+si], ah
+ 001B  46			            inc    si
+				            
+ 001C  3C 00			            cmp    al, 0
+ 001E  75 F5			            jnz    divLoop
+ 0020  4E						dec si
+ 0021				    output: 
+ 0021  8A 10			            mov    dl, [bx+si]
+ 0023  4E			     		dec si
+ 0024  80 C2 30			            add    dl, '0'
+				            
+ 0027  B4 02			            mov    ah, 2
+ 0029  CD 21			            int    21h
+				            
+ 002B  83 FE FF			            cmp    si ,-1
+ 002E  75 F1			            jnz    output
+				            
+ 0030  B4 4C			            MOV    AH,4CH
+ 0032  CD 21			            INT    21H
+ 0034				CODES ENDS
+				    END START
+
+Microsoft (R) Macro Assembler Version 6.11		    09/19/22 15:47:39
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+CODES  . . . . . . . . . . . . .	16 Bit	 0034	  Para	  Private 
+DATAS  . . . . . . . . . . . . .	16 Bit	 0007	  Para	  Private 
+STACKS . . . . . . . . . . . . .	16 Bit	 0000	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+AREA . . . . . . . . . . . . . .	Byte	 0003	  DATAS	
+CRLF . . . . . . . . . . . . . .	Byte	 0000	  DATAS	
+START  . . . . . . . . . . . . .	L Near	 0000	  CODES	
+divLoop  . . . . . . . . . . . .	L Near	 0015	  CODES	
+output . . . . . . . . . . . . .	L Near	 0021	  CODES	
+
+	   0 Warnings
+	   0 Errors

@@ -1,0 +1,54 @@
+Microsoft (R) Macro Assembler Version 6.11		    10/07/22 11:37:43
+tempfile.asm						     Page 1 - 1
+
+
+				assume cs:code
+
+ 0000				data segment
+ 0000  0010 [			    db 16 dup(0)
+        00
+       ]
+ 0010				data ends
+
+ 0000				stack segment
+ 0000  0010 [			    db 16 dup(0)
+        00
+       ]
+ 0010				stack ends
+
+ 0000				code segment
+ 0000				    start:
+ 0000  B8 1000			    mov ax, 1000h
+ 0003  BA 0001			    mov dx, 1
+ 0006  BB 0001			    mov bx, 1
+ 0009  F7 F3			    div bx
+				    
+
+ 000B  B4 4C			    mov ah, 4ch
+ 000D  CD 21			    int 21h
+ 000F				code ends
+
+				end start
+Microsoft (R) Macro Assembler Version 6.11		    10/07/22 11:37:43
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+code . . . . . . . . . . . . . .	16 Bit	 000F	  Para	  Private 
+data . . . . . . . . . . . . . .	16 Bit	 0010	  Para	  Private 
+stack  . . . . . . . . . . . . .	16 Bit	 0010	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+start  . . . . . . . . . . . . .	L Near	 0000	  code	
+
+	   0 Warnings
+	   0 Errors

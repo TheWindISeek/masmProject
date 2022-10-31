@@ -1,0 +1,93 @@
+Microsoft (R) Macro Assembler Version 6.11		    10/08/22 15:12:03
+tempfile.asm						     Page 1 - 1
+
+
+				assume cs:code, ds:datas, ss:stacks
+
+ 0000				datas segment
+ 0000  0020 [			    db 32 dup(0)
+        00
+       ]
+ 0020				datas ends
+
+ 0000				stacks segment
+ 0000  0020 [			    db 32 dup(0)
+        00
+       ]
+ 0020				stacks ends
+
+ 0000				code segment
+				    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				    ;divide error   0
+				    ;single step    1
+				    ;execute into   4
+				    ;execute int    followed code
+				    ;
+				    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				    ;interrupt vector table (8086)
+				    ;0000:03ff
+				    ;List items : 2 words = bias + segment address;0->1
+				    ;IP:N*4; CS: N*4+2
+				    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				    ;get interrupt code
+				    ;push FLAGS
+				    ;set TF <- 0, IF <- 0
+				    ;push cx
+				    ;push ip
+				    ;ip <- n * 4, cs <- n * 4 + 2
+				    ;give the control to program
+				    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				    ;interrupt program process:
+				    ;   push register
+				    ;   handle with interrupt
+				    ;   pop register
+				    ;   iret = 
+				    ;       pop ip
+				    ;       pop cs
+				    ;       popf
+				    ;
+				    ;
+				    ;
+				    ;
+				    ;
+				    ;
+ 0000				    start:
+ 0000  B8 ---- R		    mov ax, datas
+ 0003  8E D8			    mov ds, ax
+ 0005  B8 ---- R		    mov ax, stacks
+ 0008  8E D0			    mov ss, ax
+ 000A  BC 0020			    mov sp, 20h
+				    ;;;;;;;;;;;;;;;;;
+ 000D  B8 1000			    mov ax, 1000h
+ 0010  B7 01			    mov bh, 1
+ 0012  F6 F7			    div bh
+
+				    ;;;;;;;;;;;;;;;;;
+ 0014  B4 4C			    mov ah, 4ch
+ 0016  CD 21			    int 21h
+ 0018				code ends
+
+				end start
+Microsoft (R) Macro Assembler Version 6.11		    10/08/22 15:12:03
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+code . . . . . . . . . . . . . .	16 Bit	 0018	  Para	  Private 
+datas  . . . . . . . . . . . . .	16 Bit	 0020	  Para	  Private 
+stacks . . . . . . . . . . . . .	16 Bit	 0020	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+start  . . . . . . . . . . . . .	L Near	 0000	  code	
+
+	   0 Warnings
+	   0 Errors

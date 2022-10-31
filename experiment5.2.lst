@@ -1,0 +1,63 @@
+Microsoft (R) Macro Assembler Version 6.11		    10/05/22 20:34:27
+tempfile.asm						     Page 1 - 1
+
+
+				ASSUME cs:code, ds:data, ss:stack
+
+ 0000				new segment
+ 0000  0001 0002 0003			dw 1h, 2h, 3h, 4h, 5h, 6h, 7h, 8h
+       0004 0005 0006
+       0007 0008
+ 0010				new ends
+
+ 0000				data SEGMENT
+ 0000  0123 0456		         dw 0123h, 0456h
+ 0004				data ENDS
+
+ 0000				stack SEGMENT
+ 0000  0000 0000		          dw 0, 0
+ 0004				stack ends
+
+ 0000				code SEGMENT
+				;cs = 0772 ss = 076f ds = 0760
+ 0000  B8 ---- R		    START:mov  ax, stack
+ 0003  8E D0			          mov  ss, ax
+ 0005  BC 0010			          mov  sp, 16
+
+ 0008  B8 ---- R		          mov  ax, data
+ 000B  8E D8			          mov  ds, ax
+
+ 000D  FF 36 0000		          push ds:[0]
+ 0011  FF 36 0002		          push ds:[2]
+ 0015  8F 06 0002		          pop  ds:[2]
+ 0019  8F 06 0000		          pop  ds:[0]
+						;cs = 0772 ss = 0771 ds = 0770
+ 001D  B8 4C00			          mov  ax, 4c00h
+ 0020  CD 21			          int  21h
+ 0022				code ENDS
+				end START
+
+Microsoft (R) Macro Assembler Version 6.11		    10/05/22 20:34:27
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+code . . . . . . . . . . . . . .	16 Bit	 0022	  Para	  Private 
+data . . . . . . . . . . . . . .	16 Bit	 0004	  Para	  Private 
+new  . . . . . . . . . . . . . .	16 Bit	 0010	  Para	  Private 
+stack  . . . . . . . . . . . . .	16 Bit	 0004	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+START  . . . . . . . . . . . . .	L Near	 0000	  code	
+
+	   0 Warnings
+	   0 Errors

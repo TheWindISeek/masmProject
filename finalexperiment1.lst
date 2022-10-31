@@ -1,0 +1,507 @@
+Microsoft (R) Macro Assembler Version 6.11		    10/07/22 19:58:32
+tempfile.asm						     Page 1 - 1
+
+
+				assume cs:code, ss:stack, ds:data
+
+ 0000				data segment
+				      ;21 �?
+ 0000  31 39 37 35 31 39	            db '1975', '1976', '1977', '1978', '1979', '1980', '1981'
+       37 36 31 39 37 37
+       31 39 37 38 31 39
+       37 39 31 39 38 30
+       31 39 38 31
+ 001C  31 39 38 32 31 39	            db '1982', '1983', '1984', '1985', '1986', '1987', '1988'
+       38 33 31 39 38 34
+       31 39 38 35 31 39
+       38 36 31 39 38 37
+       31 39 38 38
+ 0038  31 39 38 39 31 39	            db '1989', '1990', '1991', '1992', '1993', '1994', '1995'
+       39 30 31 39 39 31
+       31 39 39 32 31 39
+       39 33 31 39 39 34
+       31 39 39 35
+				    
+				      ;21年总收�?
+ 0054  00000010 00000016	            dd 16,      22,         382,        1356,       2390,       8000,       16000
+       0000017E 0000054C
+       00000956 00001F40
+       00003E80
+ 0070  00005FA6 0000C391	            dd 24486,   50065,      97479,      140417,     197514,     345980,     590827
+       00017CC7 00022481
+       0003038A 0005477C
+       000903EB
+ 008C  000C42CA 00120D18	            dd 803530,  1183000,    1843000,    2759000,    3753000,    4649000,    5937000
+       001C1F38 002A1958
+       00394428 0046F028
+       005A9768
+				    
+				      ;21个雇员人�?
+ 00A8  0003 0007 0009		            dw 3,       7,      9,      13,     28,     38,     130
+       000D 001C 0026
+       0082
+ 00B6  00DC 01DC 030A		            dw 220,     476,    778,    1001,   1442,   2258,   2793
+       03E9 05A2 08D2
+       0AE9
+ 00C4  0FC5 1603 2022		            dw 4037,    5635,   8226,   11542,  14430,  15257,  17800
+       2D16 385E 3B99
+       4588
+ 00D2  000E [			            db 14 dup(0)                                                                         ;补全好看数据
+        00
+       ]
+ 00E0  0015 [			      table db 21 dup('year summ ne ?? ')
+        79 65 61 72 20 73
+        75 6D 6D 20 6E 65
+        20 3F 3F 20
+       ]
+ 0230  0010 [			      show_buffer db 16 dup(0)
+        00
+       ]
+				      ;00e0
+ 0240				data ends
+
+ 0000				stack segment
+ 0000  0040 [			            db 64 dup(0)
+        00
+       ]
+ 0040				stack ends
+
+ 0000				code segment
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 0000				      start:          
+ 0000  B8 ---- R		                      mov  ax, data
+ 0003  8E D8			                      mov  ds, ax
+
+ 0005  B8 ---- R		                      mov  ax, stack
+ 0008  8E D0			                      mov  ss, ax
+ 000A  BC 0040			                      mov  sp, 40h
+				      ;;;;;;;;;;;;;;;;;;;
+ 000D  E8 0101			                      call matrixTransform
+				      ;;;;;;;;;;;;;;;;;;;;
+				      ;already put the data into table : 00e0
+ 0010  B9 0015			                        mov cx, 21
+ 0013  B6 1E			                        mov dh, 30
+ 0015  BB 00E0 R		                        mov bx, offset table
+ 0018				                        rowLoop:
+ 0018  51			                        push cx
+				                        ;;;;;;;;;;;;;;;;;
+
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				                        ;year 4 byte
+ 0019  B2 00			                        mov dl, 0h
+ 001B  BF 0000			                        mov di, 0h
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				                        ;let the data in ds:[bx+di] into buffer
+ 001E  52			                        push dx
+ 001F  50			                        push ax
+				                        ;ax low; dx high
+ 0020  8B 01			                        mov ax, ds:[bx+di]
+ 0022  8B 51 02			                        mov dx, ds:[bx+di+2]
+ 0025  BE 0230 R		                        mov si, offset show_buffer
+ 0028  E8 009D			                        call dwordToString
+ 002B  58			                        pop ax
+ 002C  5A			                        pop dx
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				                        ;use buffer change vision memory
+ 002D  E8 0149			                        call show_str
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				                        ;income 4 byte
+ 0030  B2 06			                        mov dl, 6h
+ 0032  BF 0005			                        mov di, 5h
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				                        ;let the data in ds:[bx+di] into buffer
+ 0035  52			                        push dx
+ 0036  50			                        push ax
+ 0037  8B 01			                        mov ax, ds:[bx+di]
+ 0039  8B 51 02			                        mov dx, ds:[bx+di+2]
+ 003C  BE 0230 R		                        mov si, offset show_buffer
+ 003F  E8 0086			                        call dwordToString
+ 0042  58			                        pop ax
+ 0043  5A			                        pop dx
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 0044  E8 0132			                        call show_str
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				                        ;number 2 byte
+ 0047  B2 0F			                        mov dl, 0fh
+ 0049  BF 000A			                        mov di, 0ah
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 004C  50			                        push ax
+ 004D  8B 01			                        mov ax, ds:[bx+di]
+ 004F  BE 0230 R		                        mov si, offset show_buffer
+ 0052  E8 0036			                        call wordToString
+ 0055  58			                        pop ax
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 0056  E8 0120			                        call show_str
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				                        ;avg 2 byte
+ 0059  B2 16			                        mov dl, 016h
+ 005B  BF 000D			                        mov di, 0dh
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 005E  50			                        push ax
+ 005F  8B 01			                        mov ax, ds:[bx+di]
+ 0061  BE 0230 R		                        mov si, offset show_buffer
+ 0064  E8 0024			                        call wordToString
+ 0067  58			                        pop ax
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 0068  E8 010E			                        call show_str
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 006B  80 C6 A0			                        add dh, 0a0h; next screen row
+ 006E  81 C3 00A0		                        add bx, 0a0h; next table row
+ 0072  59			                        pop cx
+ 0073  E2 A3			                        loop rowLoop
+				                        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+				      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 0075  BE 0230 R		                        mov si, offset show_buffer
+ 0078  B8 C841			                        mov ax, 51265
+ 007B  E8 000D			                        call wordToString
+ 007E  B6 08			                        mov dh, 8
+ 0080  B2 03			                        mov dl, 3
+ 0082  B1 02			                        mov cl, 2
+ 0084  E8 00F2			                        call   show_str                        
+				                  
+ 0087  B4 4C			                      mov  ah, 4ch
+ 0089  CD 21			                      int  21h
+
+
+
+
+
+
+ 008B				    wordToString:        
+				    ;function:
+				    ;input: ax = word; ds:si = the first address of string
+				    ;return: void
+ 008B  52			                 push dx
+ 008C  51			                 push cx
+ 008D  53			                 push bx
+ 008E  50			                 push ax
+ 008F  56			                 push si
+				    ;
+ 0090  BA 0000			                 mov  dx, 0
+				    ;ah = rem, al = ans
+ 0093				    divStr:      
+ 0093  B1 0A			                 mov  cl, 10
+ 0095  E8 001B			                 call divdb
+ 0098  51			                 push cx
+ 0099  42			                 inc  dx
+ 009A  83 F8 00			                 cmp  ax, 0
+ 009D  75 F4			                 jnz  divStr
+ 009F  8B CA			                 mov  cx, dx
+ 00A1				    writeStr:    
+ 00A1  5A			                 pop  dx
+ 00A2  80 C2 30			                 add  dl, 30h
+ 00A5  88 14			                 mov  ds:[si], dl
+ 00A7  46			                 inc  si
+ 00A8  E2 F7			                 loop writeStr
+ 00AA  C6 04 00			                 mov  ds:[si], byte ptr 0
+				    ;
+ 00AD  5E			                 pop  si
+ 00AE  58			                 pop  ax
+ 00AF  5B			                 pop  bx
+ 00B0  59			                 pop  cx
+ 00B1  5A			                 pop  dx
+				    ;jmp  next
+ 00B2  C3			                 ret
+
+
+ 00B3				   divdb:;16/8 not overflow
+				    ;function: word byte word
+				    ;input: ah = word ; al = word; cl =
+				    ;output: ah = ans ; al = ans ; cl =
+ 00B3  52			                 push dx
+				    ;
+ 00B4  50			                 push ax                        ;
+				    ;
+ 00B5  8A C4			                 mov  al, ah
+ 00B7  B4 00			                 mov  ah, 0
+ 00B9  F6 F1			                 div  cl
+				    ;ah =  al =
+ 00BB  8B D0			                 mov  dx, ax                    ;
+ 00BD  58			                 pop  ax                        ;
+ 00BE  8A E6			                 mov  ah, dh                    ;
+ 00C0  F6 F1			                 div  cl
+				    ;ah = al =
+ 00C2  8A CC			                 mov  cl, ah
+ 00C4  8A E2			                 mov  ah, dl
+				    ;
+ 00C6  5A			                 pop  dx
+ 00C7  C3			                 ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 00C8				      dwordToString:           
+				      ;dword to string end with 0
+				      ;input : ax = dword's lower 16 bits; dx = dword's high 16 bits; ds:si = first address of string
+				      ;return : void
+				            ;;;;;;;;;;;;;;;;;;
+ 00C8  50			            push ax
+ 00C9  53			            push bx
+ 00CA  51			            push cx
+ 00CB  52			            push dx
+ 00CC  56			            push si
+ 00CD  57			            push di
+ 00CE  06			            push es
+ 00CF  55			            push bp
+				            ;;;;;;;;;;;;;;;;;
+ 00D0  BB 0000			            mov bx, 0
+ 00D3  B9 000A			            mov cx, 10
+ 00D6  E8 0024			            call divdw
+
+ 00D9				            divLoop:
+ 00D9  51			            push cx
+ 00DA  B9 000A			            mov cx, 10
+ 00DD  E8 001D			            call divdw
+ 00E0  43			            inc bx
+ 00E1  83 F9 00			            cmp cx, 0
+ 00E4  75 F3			            jnz divLoop;if mod is not zero cycle
+				            ;
+				            ;execute data to string
+				            ;
+ 00E6  8B CB			            mov cx, bx
+ 00E8				            dataToStringLoop:
+				            ;get data 
+ 00E8  5B			            pop bx
+ 00E9  80 C3 30			            add bl, '0'
+ 00EC  88 1C			            mov ds:[si], bl
+ 00EE  46			            inc si
+ 00EF  E2 F7			            loop dataToStringLoop
+				            ;结束符号
+ 00F1  C6 04 00			            mov ds:[si], byte ptr 0
+				            ;;;;;;;;;;;;;;;;;
+ 00F4  5D			            pop bp
+ 00F5  07			            pop es
+ 00F6  5F			            pop di
+ 00F7  5E			            pop si
+ 00F8  5A			            pop dx
+ 00F9  59			            pop cx
+ 00FA  5B			            pop bx
+ 00FB  58			            pop ax          
+				            ;;;;;;;;;;;;;;;;;;
+ 00FC  C3			            ret
+
+
+
+ 00FD				      divdw:          
+				      ;进行不会产生溢出的除法运�?
+				      ;被除数为dword 除数为word 结果为dword
+				      ;input: ax �?6�? dx �?6�? cx 除数
+				      ;result: ax �?6�? dx �?6�? cx 余数
+				      ;x/n = int(h/n)*65536 + [rem(h/n)*65536+L]/N
+				      ;左边a�?右边b�?那么乘的就是2^b
+ 00FD  53			                      push bx
+				 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;   
+ 00FE  50			                      push ax                           ;保存低位
+ 00FF  8B C2			                      mov  ax, dx
+ 0101  BA 0000			                      mov  dx, 0
+ 0104  F7 F1			                      div  cx
+				      ;dx 余数 ax 高位结果
+ 0106  8B D8			                      mov  bx, ax                       ;bx 保存高位结果
+ 0108  58			                      pop  ax                           ;拿出低位
+ 0109  F7 F1			                      div  cx
+				      ;dx 余数 ax低位结果
+ 010B  8B CA			                      mov  cx, dx
+ 010D  8B D3			                      mov  dx, bx
+				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 010F  5B			                      pop  bx
+ 0110  C3			                      ret
+
+
+ 0111				      matrixTransform:
+				      ; bp 指向 table bx固定不变 恒为0
+ 0111  55			                      push bp
+ 0112  56			                      push si
+ 0113  06			                      push es
+ 0114  57			                      push di
+ 0115  52			                      push dx
+ 0116  51			                      push cx
+ 0117  53			                      push bx
+ 0118  50			                      push ax
+				      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 0119  BB 0000			                      mov  bx, 0
+ 011C  BD 00E0 R		                      mov  bp, offset table
+ 011F  8C D8			                      mov  ax, ds
+ 0121  8E C0			                      mov  es, ax
+ 0123  B9 0015			                      mov  cx, 21                       ;21years
+ 0126  BE 0000			                      mov  si, 0
+ 0129  BF 0000			                      mov  di, 0
+				      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 012C				      row:            
+ 012C  51			                      push cx
+				      ;year
+				      ;将年份放到指定位�?
+ 012D  52			                      push dx
+ 012E  BB 0000			                      mov  bx, 0                        ; find the begin of years
+ 0131  8B 10			                      mov  dx, [bx+si]
+ 0133  26: 89 56 00		                      mov  es:[bp], dx
+ 0137  8B 50 02			                      mov  dx, [bx+si+2]
+ 013A  26: 89 56 02		                      mov  es:2h[bp], dx
+ 013E  5A			                      pop  dx
+
+				      ;income nums avg_income
+				      ; 将收�?四字节放入指定位�?每次移动两个字节 取出人数 两个字节 进行32/16 将结果放入avg_income
+				      ;si = 4*n; bx = 0; bp = 16*n;
+				      ;income = 5-8; ne = a-b; avg = d-e;
+				      ;bx = 30h dword income
+				      ;bx = 90h word nums
+ 013F  50			                      push ax
+ 0140  52			                      push dx
+ 0141  51			                      push cx
+				      ;;;;;;;;;;;;;;;;;;;;;;;;
+ 0142  BB 0054			                      mov  bx, 54h                      ; find the begin of income
+ 0145  8B 00			                      mov  ax, word ptr [bx][si]        ;
+ 0147  8B 50 02			                      mov  dx, word ptr [bx][si+2]      ;
+ 014A  26: 89 46 05		                      mov  es:5h[bp], ax
+ 014E  26: 89 56 07		                      mov  es:7h[bp], dx
+
+ 0152  BB 00A8			                      mov  bx, 0a8h                     ; find the begin of nums
+ 0155  8B 09			                      mov  cx, word ptr [bx][di]
+ 0157  26: 89 4E 0A		                      mov  es:0ah[bp], cx
+				    
+ 015B  F7 F1			                      div  cx
+ 015D  26: 89 46 0D		                      mov  es:0dh[bp], ax               ; mov the avg_income to the right place
+				      ;;;;;;;;;;;;;;;;;;;;;
+ 0161  59			                      pop  cx
+ 0162  5A			                      pop  dx
+ 0163  58			                      pop  ax
+				      ;;;;;;;;;;;;;;;;;;;;;
+				      ;si 指向下一年份 bp移动到下一�?
+ 0164  83 C6 04			                      add  si, 4
+ 0167  83 C7 02			                      add  di, 2
+ 016A  83 C5 10			                      add  bp, 10h
+ 016D  59			                      pop  cx
+ 016E  E2 BC			                      loop row
+
+				      ;;;;;;;
+ 0170  58			                      pop  ax
+ 0171  5B			                      pop  bx
+ 0172  59			                      pop  cx
+ 0173  5A			                      pop  dx
+ 0174  5F			                      pop  di
+ 0175  07			                      pop  es
+ 0176  5E			                      pop  si
+ 0177  5D			                      pop  bp
+ 0178  C3			                      ret
+
+
+ 0179				    show_str:    
+				    ;function: show a string with 0 in place (dh row, dl column) show color(cl)
+				    ;dh = row; dl = column; cl = color; ds:si = first address of string
+				    ;return void
+				    ;b800:0000 : 0 row
+				    ;00 - 01 : 0 column
+				    ;0a0h byte
+ 0179  06			                 push es
+ 017A  56			                 push si
+ 017B  52			                 push dx
+ 017C  51			                 push cx
+ 017D  53			                 push bx
+ 017E  50			                 push ax
+				    ;bias
+ 017F  BB B800			                 mov  bx, 0b800h
+ 0182  8E C3			                 mov  es, bx
+ 0184  BB 0000			                 mov  bx, 0
+				    
+				    ;row; bx = dh * a0 + bx
+ 0187  B8 00A0			                 mov  ax, 00a0h
+ 018A  F6 E6			                 mul  dh
+ 018C  03 D8			                 add  bx, ax
+				    ;column; bx = dl * 2 + bx
+ 018E  B8 0002			                 mov  ax, 0002h
+ 0191  F6 E6			                 mul  dh
+ 0193  03 D8			                 add  bx, ax
+				    
+				    ;set string
+				    ;restore cx dx
+ 0195  8A C1			                 mov  al, cl
+ 0197				    stringLoop:  
+ 0197  8A 0C			                 mov  cl, ds:[si]               ;get char
+ 0199  B5 00			                 mov  ch, 0
+ 019B  E3 0B			                 jcxz end_show_str              ; if zero jmp end_show_str
+ 019D  8A E8			                 mov  ch, al                    ; set font
+ 019F  26: 89 0F		                 mov  es:[bx], cx               ; set data
+
+				    ;move back
+ 01A2  83 C3 02			                 add  bx, 2
+ 01A5  46			                 inc  si
+ 01A6  EB EF			                 jmp  short stringLoop
+
+				    ;return
+ 01A8				    end_show_str:
+ 01A8  58			                 pop  ax
+ 01A9  5B			                 pop  bx
+ 01AA  59			                 pop  cx
+ 01AB  5A			                 pop  dx
+ 01AC  5E			                 pop  si
+ 01AD  07			                 pop  es
+ 01AE  C3			                 ret
+
+
+ 01AF				code ends
+
+				end start 
+
+
+
+
+Microsoft (R) Macro Assembler Version 6.11		    10/07/22 19:58:32
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+code . . . . . . . . . . . . . .	16 Bit	 01AF	  Para	  Private 
+data . . . . . . . . . . . . . .	16 Bit	 0240	  Para	  Private 
+stack  . . . . . . . . . . . . .	16 Bit	 0040	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+dataToStringLoop . . . . . . . .	L Near	 00E8	  code	
+divLoop  . . . . . . . . . . . .	L Near	 00D9	  code	
+divStr . . . . . . . . . . . . .	L Near	 0093	  code	
+divdb  . . . . . . . . . . . . .	L Near	 00B3	  code	
+divdw  . . . . . . . . . . . . .	L Near	 00FD	  code	
+dwordToString  . . . . . . . . .	L Near	 00C8	  code	
+end_show_str . . . . . . . . . .	L Near	 01A8	  code	
+matrixTransform  . . . . . . . .	L Near	 0111	  code	
+rowLoop  . . . . . . . . . . . .	L Near	 0018	  code	
+row  . . . . . . . . . . . . . .	L Near	 012C	  code	
+show_buffer  . . . . . . . . . .	Byte	 0230	  data	
+show_str . . . . . . . . . . . .	L Near	 0179	  code	
+start  . . . . . . . . . . . . .	L Near	 0000	  code	
+stringLoop . . . . . . . . . . .	L Near	 0197	  code	
+table  . . . . . . . . . . . . .	Byte	 00E0	  data	
+wordToString . . . . . . . . . .	L Near	 008B	  code	
+writeStr . . . . . . . . . . . .	L Near	 00A1	  code	
+
+	   0 Warnings
+	   0 Errors

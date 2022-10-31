@@ -1,0 +1,62 @@
+Microsoft (R) Macro Assembler Version 6.11		    09/05/22 15:44:53
+tempfile.asm						     Page 1 - 1
+
+
+ 0000				DATAS SEGMENT
+ 0000 48 65 6C 6C 6F 24		    HELLO byte 'Hello$'
+ 0006 57 6F 72 6C 64 24		    WORLD byte 'World$'
+ 000C 0D 0A 24			    CHANGELINE DB 13,10,'$'
+ 000F				DATAS ENDS
+
+ 0000				STACKS SEGMENT
+				    ;此处输入堆栈段代码
+ 0000				STACKS ENDS
+
+ 0000				CODES SEGMENT
+				    ASSUME CS:CODES,DS:DATAS,SS:STACKS
+ 0000				START:
+ 0000  B8 ---- R		    MOV AX,DATAS
+ 0003  8E D8			    MOV DS,AX
+				    ;此处输入代码段代码
+ 0005  BA 0000 R		    mov dx,offset HELLO
+ 0008  B4 09			    mov ah,09h
+ 000A  CD 21			    int 21h
+				    
+ 000C  BA 000C R		    mov dx,offset CHANGELINE 
+ 000F  B4 09			    mov ah,09h
+ 0011  CD 21			    int 21h
+				    
+ 0013  BA 0006 R		    mov dx,offset WORLD
+ 0016  B4 09			    mov ah,09h
+ 0018  CD 21			    int 21h
+				    
+ 001A  B4 4C			    MOV AH,4CH
+ 001C  CD 21			    INT 21H
+ 001E				CODES ENDS
+				    END START
+Microsoft (R) Macro Assembler Version 6.11		    09/05/22 15:44:53
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+CODES  . . . . . . . . . . . . .	16 Bit	 001E	  Para	  Private 
+DATAS  . . . . . . . . . . . . .	16 Bit	 000F	  Para	  Private 
+STACKS . . . . . . . . . . . . .	16 Bit	 0000	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+CHANGELINE . . . . . . . . . . .	Byte	 000C	  DATAS	
+HELLO  . . . . . . . . . . . . .	Byte	 0000	  DATAS	
+START  . . . . . . . . . . . . .	L Near	 0000	  CODES	
+WORLD  . . . . . . . . . . . . .	Byte	 0006	  DATAS	
+
+	   0 Warnings
+	   0 Errors

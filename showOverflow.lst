@@ -1,0 +1,156 @@
+Microsoft (R) Macro Assembler Version 6.11		    10/08/22 16:51:17
+tempfile.asm						     Page 1 - 1
+
+
+				assume cs:code, ss:stacks, ds:datas
+				    ;code interrupt program 
+				    ;set up interrupt program
+				    ;alter 0000:0(ip) 0000:2(cs)
+				    ;make interrupt
+				    ;return 
+ 0000				datas segment
+ 0000  0020 [			    db 32 dup(0)
+        00
+       ]
+ 0020				datas ends
+
+ 0000				stacks segment
+ 0000  0020 [			    db 32 dup(0)
+        00
+       ]
+ 0020				stacks ends
+
+ 0000				code segment
+ 0000				    interruptProgram:
+ 0000  50			    push ax
+ 0001  51			    push cx
+ 0002  06			    push es
+ 0003  57			    push di
+ 0004  56			    push si
+				    ;;;;;;;;;;;;;;;;;;
+ 0005  EB 09			    jmp endShowString;skip data
+ 0007 6F 76 65 72 66 6C		    showString db "overflow!"
+       6F 77 21
+ 0010  90			    endShowString:nop
+ 0011  B8 B800			    mov ax, 0b800h;the address of Video Random Access Memory
+ 0014  8E C0			    mov es, ax
+ 0016  BF 07C8			    mov di, 12*160+36*2;which place
+				    ;
+ 0019  8D 36 0007 R			lea si, showString;the first address of string
+ 001D  B9 0009			    mov cx, offset endShowString - offset showString;length of string
+				    ;
+ 0020  8A 04			    movStringLoop:mov al, [si]
+ 0022  26: 88 05		    mov es:[di], al
+ 0025  46			    inc si
+ 0026  83 C7 02			    add di, 2
+ 0029  E2 F5			    loop movStringLoop
+				    ;;;;;;;;;;;;;;;
+ 002B  B2 39			    mov dl, '9';test whether execute this program or not
+ 002D  B4 02			    mov ah, 2
+ 002F  CD 21			    int 21h
+				    ;;;;;;;;;;;;;;;;;;
+ 0031  5E			    pop si
+ 0032  5F			    pop di
+ 0033  07			    pop es
+ 0034  59			    pop cx
+ 0035  58			    pop ax
+ 0036  B4 4C			    mov ah, 4ch
+ 0038  CD 21			    int 21h
+ 003A  CF			    iret 
+				    ;;;;;;;;;;;;;;;;;
+
+				    ;;;;;;;;;;;;;;;;;
+ 003B				    start:
+				    ;
+				    ;
+				    ;
+ 003B  8C C8			    mov ax, cs
+ 003D  BE 0000 R		    mov si, offset interruptProgram;get program cs:ip
+ 0040  BF 0200			    mov di, 200h;set source cs:ip = 0000:0200h
+ 0043  B9 003B			    mov cx, offset start - offset interruptProgram;program size
+ 0046  E8 FFB7			    call interruptProgram
+				    ;
+				    ;Trigger interrupt
+				    ;
+ 0049  B8 1000			    mov ax, 1000h
+ 004C  B3 01			    mov bl, 1
+ 004E  F6 F3			    div bl
+				    ;
+				    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 0050  B4 4C			    mov ah, 4ch
+ 0052  CD 21			    int 21h
+				    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 0054				    setupInterruptProgram:
+				    ;function : setup interrupt program
+				    ;input : cx = size of interrupt program; 
+				    ;ax:si = cs:ip of interrupt program;
+				    ;di = number of interrupt
+				    ;
+				    ;output : void
+				    ;
+ 0054  9C			    pushf
+ 0055  1E			    push ds
+ 0056  06			    push es
+ 0057  56			    push si
+ 0058  57			    push di 
+ 0059  52			    push dx
+ 005A  51			    push cx
+ 005B  53			    push bx
+ 005C  50			    push ax
+				    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 005D  8E D8			    mov ds, ax
+ 005F  B8 0000			    mov ax, 0
+ 0062  8E C0			    mov es, ax
+ 0064  FC			    cld
+ 0065  F3/ A4			    rep movsb;-> by byte
+				    ;alter interrupt vector table
+ 0067  B8 0000			    mov ax, 0
+ 006A  8E C0			    mov es, ax
+ 006C  D1 E7			    shl di, 1
+ 006E  D1 E7			    shl di, 1
+ 0070  26: C7 05 0200		    mov  es:[di],word ptr 200h
+ 0075  26: C7 45 02 0000	    mov  es:[di+2],word ptr 0h
+				    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 007B  58			    pop ax
+ 007C  5B			    pop bx
+ 007D  59			    pop cx
+ 007E  5A			    pop dx
+ 007F  5F			    pop di
+ 0080  5E			    pop si
+ 0081  07			    pop es
+ 0082  1F			    pop ds
+ 0083  9D			    popf
+ 0084  C3			    ret
+
+ 0085				code ends
+
+				end start
+
+Microsoft (R) Macro Assembler Version 6.11		    10/08/22 16:51:17
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+code . . . . . . . . . . . . . .	16 Bit	 0085	  Para	  Private 
+datas  . . . . . . . . . . . . .	16 Bit	 0020	  Para	  Private 
+stacks . . . . . . . . . . . . .	16 Bit	 0020	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+endShowString  . . . . . . . . .	L Near	 0010	  code	
+interruptProgram . . . . . . . .	L Near	 0000	  code	
+movStringLoop  . . . . . . . . .	L Near	 0020	  code	
+setupInterruptProgram  . . . . .	L Near	 0054	  code	
+showString . . . . . . . . . . .	Byte	 0007	  code	
+start  . . . . . . . . . . . . .	L Near	 003B	  code	
+
+	   0 Warnings
+	   0 Errors

@@ -1,0 +1,167 @@
+Microsoft (R) Macro Assembler Version 6.11		    09/19/22 14:28:36
+tempfile.asm						     Page 1 - 1
+
+
+ 0000				DATAS SEGMENT
+ 0000 0D 0A 24			    CRLF db 13,10,'$'
+ 0003				DATAS ENDS
+
+ 0000				STACKS SEGMENT
+				    ;此处输入堆栈段代码
+ 0000				STACKS ENDS
+
+ 0000				CODES SEGMENT
+				    ASSUME CS:CODES,DS:DATAS,SS:STACKS
+ 0000				START:
+ 0000  B8 ---- R		    MOV AX,DATAS
+ 0003  8E D8			    MOV DS,AX
+					;输入字符 直到遇到非数字字符
+ 0005  E8 0004			    call input
+				    
+ 0008  B4 4C			    mov ah, 4ch
+ 000A  CD 21			    int 21h
+				    
+				    ;编写子程序input
+				    ;
+ 000C				    input proc
+				    ;压栈
+ 000C  52			    push dx
+ 000D  50			    push ax
+ 000E  51			    push cx
+ 000F  53			 	push bx
+				    ;读取字符 放
+ 0010  B1 0A			    mov cl, 10
+ 0012  BB 0000			    mov bx, 0
+ 0015				    read:
+				    
+ 0015  B4 01			    mov ah, 1
+ 0017  CD 21			    int 21h
+				    
+				    
+				    
+ 0019  3C 30			    cmp al, '0'
+ 001B  72 15			    jb quit;如果dl小于0
+ 001D  3C 39			    cmp al, '9'
+ 001F  7F 11			    jg quit;如果比9大
+				    
+ 0021  8A D0			    mov dl, al
+ 0023  8B C3			    mov ax, bx
+ 0025  F6 E1			    mul cl
+ 0027  80 EA 30			    sub dl,'0'
+ 002A  B6 00			    mov dh, 0
+ 002C  03 C2			    add ax, dx
+ 002E  8B D8			    mov bx, ax
+				    
+ 0030  EB E3			    jmp read
+				    
+
+ 0032				    quit:
+ 0032  8D 16 0000 R		    lea dx, CRLF
+ 0036  B4 09			    mov ah, 9
+ 0038  CD 21			    int 21h
+				    ;输出结果
+ 003A  8B C3			    mov ax, bx
+ 003C  E8 0005			    call output
+				    ;出栈
+ 003F  5B			    pop bx
+ 0040  59			    pop cx
+ 0041  58			    pop ax
+ 0042  5A			    pop dx
+				    
+ 0043  C3			    ret 
+ 0044				    input endp
+				    
+				    
+				    
+				    
+				    
+				    
+				    
+				    ; 编写子程序output 
+				    ;将AX中的数以无符号十进制形式输出显示
+				    ;如果存在 入口参数 和 出口参数 请标注
+				     
+ 0044				    output proc
+					;压栈
+ 0044  52				push dx
+ 0045  51				push cx
+ 0046  53				push bx
+					;计数器初始化
+ 0047  B3 00				mov bl, 0
+					;无符号十进制 未知长度 需要不断除10
+					
+ 0049  B1 0A				mov cl, 10
+ 004B					bbegin:
+ 004B  B4 00				mov ah, 0 ; 别忘记给ah赋值为0
+ 004D  F6 F1				div cl
+ 004F  50				push ax;压栈
+ 0050  FE C3				inc bl
+					;除数放在 al, 余数放在ah
+
+ 0052  3C 00				cmp al, 0
+ 0054  75 F5				jnz bbegin
+					
+ 0056					aa:
+					;输出
+ 0056  5A				pop dx
+ 0057  8A D6				mov dl, dh
+ 0059  80 C2 30				add dl, '0'
+ 005C  B4 02				mov ah, 2
+ 005E  CD 21				int 21h
+ 0060  FE CB				dec bl
+					
+ 0062  83 FB 00				cmp bx, 0
+ 0065  75 EF				jnz aa
+					
+					
+					;出栈
+ 0067  5B				pop bx
+ 0068  59				pop cx
+ 0069  5A				pop dx 
+ 006A  C3				ret
+ 006B				     output endp
+				    
+				    
+ 006B  B4 4C			    MOV AH,4CH
+ 006D  CD 21			    INT 21H
+ 006F				CODES ENDS
+				    END START
+
+
+
+Microsoft (R) Macro Assembler Version 6.11		    09/19/22 14:28:36
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+CODES  . . . . . . . . . . . . .	16 Bit	 006F	  Para	  Private 
+DATAS  . . . . . . . . . . . . .	16 Bit	 0003	  Para	  Private 
+STACKS . . . . . . . . . . . . .	16 Bit	 0000	  Para	  Private 
+
+
+Procedures,  parameters and locals:
+
+                N a m e                 Type     Value    Attr
+
+input  . . . . . . . . . . . . .	P Near	 000C	  CODES	Length= 0038 Public
+  read . . . . . . . . . . . . .	L Near	 0015	  CODES	
+  quit . . . . . . . . . . . . .	L Near	 0032	  CODES	
+output . . . . . . . . . . . . .	P Near	 0044	  CODES	Length= 0027 Public
+  bbegin . . . . . . . . . . . .	L Near	 004B	  CODES	
+  aa . . . . . . . . . . . . . .	L Near	 0056	  CODES	
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+CRLF . . . . . . . . . . . . . .	Byte	 0000	  DATAS	
+START  . . . . . . . . . . . . .	L Near	 0000	  CODES	
+
+	   0 Warnings
+	   0 Errors

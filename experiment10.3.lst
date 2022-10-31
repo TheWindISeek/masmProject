@@ -1,0 +1,196 @@
+Microsoft (R) Macro Assembler Version 6.11		    10/07/22 14:42:26
+tempfile.asm						     Page 1 - 1
+
+
+				assume cs:code
+ 0000				data segment
+				    ;numbers dw 123, 12666, 1, 8, 3, 38
+ 0000  000A [			    show_buffer  db 10 dup(0)
+        00
+       ]
+ 000A  00			    db 0
+ 000B 3F 3F 3F 3F 3F 3F		    new db '?????????',0
+       3F 3F 3F 00
+ 0015				data ends
+
+ 0000				stack segment
+ 0000  0020 [			    db 32 dup(0)
+        00
+       ]
+ 0020				stack ends
+
+ 0000				code segment
+ 0000				    start:
+ 0000  B8 317A			    mov ax, 12666
+ 0003  BB ---- R		    mov bx, data
+ 0006  8E DB			    mov ds, bx
+
+					
+ 0008  BE 0000 R		    mov si, offset show_buffer
+				    ;call dtoc
+					
+ 000B  B2 32			    mov dl, 32h
+ 000D  B4 02			    mov ah, 2h
+ 000F  CD 21			    int 21h
+				    
+ 0011  BE 000B R			mov si, offset new
+ 0014  B6 08			    mov dh, 8
+ 0016  B2 03			    mov dl, 3
+ 0018  B1 02			    mov cl, 2
+ 001A  E8 003F			    call show_str
+
+ 001D  B4 4C			    mov ah, 4ch
+ 001F  CD 21			    int 21h
+
+
+ 0021				    dtoc:
+				    ;function: 
+				    ;input: ax = word; ds:si = 
+				    ;return: void
+ 0021  52			    push dx
+ 0022  51			    push cx
+ 0023  53			    push bx
+ 0024  56			    push si
+				    ;
+ 0025  B2 00			    mov dl, 0
+				    ;ah = rem, al = ans
+ 0027				    divStr:
+ 0027  B1 0A			    mov cl, 10
+ 0029  E8 001B			    call divdb
+ 002C  51			    push cx
+ 002D  83 F8 00			    cmp ax, 0
+ 0030  74 03			    jz writeStr
+ 0032  42			    inc dx
+ 0033  EB F2			    jmp divStr
+
+ 0035				writeStr:
+ 0035  59			    pop cx
+ 0036  80 C1 30			    add cl, 30h
+ 0039  88 0C			    mov ds:[si], cl
+ 003B  46			    inc si
+ 003C  4A			    dec dx
+ 003D  83 FA 00			    cmp dx, 0
+ 0040  75 F3			    jnz writeStr
+
+				    ;
+ 0042  5E			    pop si
+ 0043  5B			    pop bx
+ 0044  59			    pop cx
+ 0045  5A			    pop dx
+ 0046  C3			    ret
+
+
+ 0047				    divdb:
+				    ;function: word byte word
+				    ;input: ah = word ; al = word; cl = 
+				    ;output: ah = ans ; al = ans ; cl = 
+ 0047  52			    push dx
+				    ;
+ 0048  50			    push ax;
+				    ;
+ 0049  8A C4			    mov al, ah
+ 004B  B4 00			    mov ah, 0
+ 004D  F6 F1			    div cl
+				    ;ah =  al = 
+ 004F  8B D0			    mov dx, ax;
+ 0051  58			    pop ax; 
+ 0052  8A E6			    mov ah, dh;
+ 0054  F6 F1			    div cl
+				    ;ah = al = 
+ 0056  8A CC			    mov cl, ah
+ 0058  8A E2			    mov ah, dl
+				    ;恢复数据
+ 005A  5A			    pop dx 
+ 005B  C3			    ret
+
+
+ 005C				    show_str:
+				    ;function: show a string with 0 in place (dh row, dl column) show color(cl)
+				    ;dh = row; dl = column; cl = color; ds:si = first address of string
+				    ;return void
+				    ;b800:0000 : 0 row
+				    ;00 - 01 : 0 column
+				    ;0a0h byte
+ 005C  06			    push es
+ 005D  56			    push si
+ 005E  52			    push dx
+ 005F  51			    push cx
+ 0060  53			    push bx
+ 0061  50			    push ax
+				    ;bias 
+ 0062  BB B800			    mov bx, 0b800h
+ 0065  8E C3			    mov es, bx
+ 0067  BB 0000			    mov bx, 0
+				    
+				    ;row; bx = dh * a0 + bx
+ 006A  B8 00A0			    mov ax, 00a0h
+ 006D  F6 E6			    mul dh
+ 006F  03 D8			    add bx, ax
+				    ;column; bx = dl * 2 + bx
+ 0071  B8 0002			    mov ax, 0002h
+ 0074  F6 E6			    mul dh
+ 0076  03 D8			    add bx, ax
+				    
+				    ;set string
+				    ;restore cx dx
+ 0078  8A C1			    mov al, cl
+ 007A				    string:
+ 007A  8A 0C			    mov cl, ds:[si];get char
+ 007C  B5 00			    mov ch, 0
+ 007E  E3 0B			    jcxz end_show_str; if zero jmp end_show_str
+ 0080  8A E8			    mov ch, al; set font 
+ 0082  26: 89 0F		    mov es:[bx], cx; set data
+
+				    ;move back
+ 0085  83 C3 02			    add bx, 2
+ 0088  46			    inc si
+ 0089  EB EF			    jmp short string
+
+				    ;return 
+ 008B				    end_show_str:
+ 008B  58			    pop ax
+ 008C  5B			    pop bx
+ 008D  59			    pop cx
+ 008E  5A			    pop dx
+ 008F  5E			    pop si
+ 0090  07			    pop es
+ 0091  C3			    ret
+
+ 0092  B4 4C			    mov ah, 4ch
+ 0094  CD 21			    int 21h
+ 0096				code ends
+
+				end start
+
+Microsoft (R) Macro Assembler Version 6.11		    10/07/22 14:42:26
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+code . . . . . . . . . . . . . .	16 Bit	 0096	  Para	  Private 
+data . . . . . . . . . . . . . .	16 Bit	 0015	  Para	  Private 
+stack  . . . . . . . . . . . . .	16 Bit	 0020	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+divStr . . . . . . . . . . . . .	L Near	 0027	  code	
+divdb  . . . . . . . . . . . . .	L Near	 0047	  code	
+dtoc . . . . . . . . . . . . . .	L Near	 0021	  code	
+end_show_str . . . . . . . . . .	L Near	 008B	  code	
+new  . . . . . . . . . . . . . .	Byte	 000B	  data	
+show_buffer  . . . . . . . . . .	Byte	 0000	  data	
+show_str . . . . . . . . . . . .	L Near	 005C	  code	
+start  . . . . . . . . . . . . .	L Near	 0000	  code	
+string . . . . . . . . . . . . .	L Near	 007A	  code	
+writeStr . . . . . . . . . . . .	L Near	 0035	  code	
+
+	   0 Warnings
+	   0 Errors

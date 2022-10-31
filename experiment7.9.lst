@@ -1,0 +1,84 @@
+Microsoft (R) Macro Assembler Version 6.11		    10/05/22 22:17:41
+tempfile.asm						     Page 1 - 1
+
+
+				assume cs:codesg, ss:stacksg, ds:datasg
+
+ 0000				stacksg segment
+ 0000  0000 0000 0000		    dw 0, 0, 0, 0, 0, 0, 0, 0
+       0000 0000 0000
+       0000 0000
+ 0010				stacksg ends
+
+ 0000				datasg segment
+ 0000  31 2E 20 64 69 73	    db '1. display      '
+       70 6C 61 79 20 20
+       20 20 20 20
+ 0010  32 2E 20 62 72 6F	    db '2. brows        '
+       77 73 20 20 20 20
+       20 20 20 20
+ 0020  33 2E 20 72 65 70	    db '3. replace      '
+       6C 61 63 65 20 20
+       20 20 20 20
+ 0030  34 2E 20 6D 6F 64	    db '4. modify       '
+       69 66 79 20 20 20
+       20 20 20 20
+ 0040				datasg ends
+
+ 0000				codesg segment
+ 0000				    start:
+ 0000  B8 ---- R		        mov ax, datasg
+ 0003  8E D8			        mov ds, ax
+
+				        ;00-30 3-6 
+ 0005  B9 0004			        mov cx, 4
+ 0008  BB 0000			        mov bx, 0
+ 000B				        line:
+ 000B  51			        push cx
+				        ;
+				        ;
+ 000C  BE 0003			        mov si, 3
+ 000F  B9 0004			        mov cx, 4
+ 0012				        range:
+ 0012  8A 00			        mov al, [bx+si]
+ 0014  24 DF			        and al, 11011111B
+ 0016  88 00			        mov [bx+si], al
+ 0018  46			        inc si
+ 0019  E2 F7			        loop range
+				        ;
+				        ;
+				        ;next line
+ 001B  83 C3 10			        add bx, 10h
+ 001E  59			        pop cx
+ 001F  E2 EA			        loop line
+
+ 0021  B4 4C			        mov ah, 4CH
+ 0023  CD 21			        int 21h
+ 0025				codesg ends
+
+				end start
+Microsoft (R) Macro Assembler Version 6.11		    10/05/22 22:17:41
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+codesg . . . . . . . . . . . . .	16 Bit	 0025	  Para	  Private 
+datasg . . . . . . . . . . . . .	16 Bit	 0040	  Para	  Private 
+stacksg  . . . . . . . . . . . .	16 Bit	 0010	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+line . . . . . . . . . . . . . .	L Near	 000B	  codesg	
+range  . . . . . . . . . . . . .	L Near	 0012	  codesg	
+start  . . . . . . . . . . . . .	L Near	 0000	  codesg	
+
+	   0 Warnings
+	   0 Errors

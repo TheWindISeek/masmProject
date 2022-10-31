@@ -1,0 +1,80 @@
+Microsoft (R) Macro Assembler Version 6.11		    09/12/22 15:57:25
+tempfile.asm						     Page 1 - 1
+
+
+ 0000				DATAS SEGMENT
+ 0000 0A			    DAT1 DB 10;定义缓冲区长度
+ 0001  00			    	db ?;预留实际输入字符个数的技术单元
+ 0002  000A [			    	db 10 dup('$');设DS已是buffer的段基址
+        24
+       ]
+ 000C 0D 0A 24			    CRLF db 13,10,'$'
+ 000F				DATAS ENDS
+
+ 0000				STACKS SEGMENT
+ 0000				STACKS ENDS
+
+ 0000				CODES SEGMENT
+				    ASSUME CS:CODES,DS:DATAS,SS:STACKS
+ 0000				START:
+ 0000  B8 ---- R		    MOV AX,DATAS
+ 0003  8E D8			    MOV DS,AX
+				    ;此处输入代码段代码
+				    ;N1 最大可键入字符数
+				    ;N2 实际键入字符
+				    ;存放键入字符
+				    ;0DH
+				    ;输入字符 放在dat1 缓冲区大小为20
+ 0005  8D 16 0000 R		    lea dx, DAT1
+ 0009  B4 0A			    mov ah, 0ah
+ 000B  CD 21			    int 21h
+				    ;输出换行符 防止被吃掉
+ 000D  8D 16 000C R		    lea dx, CRLF
+ 0011  B4 09			    mov ah, 09h
+ 0013  CD 21			    int 21h
+				    ;偏移两位 跳过预定义缓冲区长度 实际输入长度
+ 0015  8D 16 0002 R		    lea dx, dat1+2
+ 0019  B4 09			    mov ah,09h
+ 001B  CD 21			    int 21h
+				    ;输出换行符 防止被吃掉
+ 001D  8D 16 000C R		    lea dx, CRLF
+ 0021  B4 09			    mov ah, 09h
+ 0023  CD 21			    int 21h
+				    ;输出实际输入长度
+ 0025  8A 16 0001 R		    mov dl, dat1+1
+ 0029  80 C2 30			    add dl, '0'
+				    
+ 002C  B4 02			    mov ah, 2
+ 002E  CD 21			    int 21h
+				    
+ 0030  B4 4C			    MOV AH,4CH
+ 0032  CD 21			    INT 21H
+ 0034				CODES ENDS
+				    END START
+
+
+Microsoft (R) Macro Assembler Version 6.11		    09/12/22 15:57:25
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+CODES  . . . . . . . . . . . . .	16 Bit	 0034	  Para	  Private 
+DATAS  . . . . . . . . . . . . .	16 Bit	 000F	  Para	  Private 
+STACKS . . . . . . . . . . . . .	16 Bit	 0000	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+CRLF . . . . . . . . . . . . . .	Byte	 000C	  DATAS	
+DAT1 . . . . . . . . . . . . . .	Byte	 0000	  DATAS	
+START  . . . . . . . . . . . . .	L Near	 0000	  CODES	
+
+	   0 Warnings
+	   0 Errors

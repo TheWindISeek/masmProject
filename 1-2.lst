@@ -1,0 +1,115 @@
+Microsoft (R) Macro Assembler Version 6.11		    09/03/22 15:21:42
+tempfile.asm						     Page 1 - 1
+
+
+ 0000				DATAS SEGMENT
+				    ;此处输入数据段代码  
+ 0000				DATAS ENDS
+
+ 0000				STACKS SEGMENT
+				    ;此处输入堆栈段代码
+ 0000				STACKS ENDS
+
+ 0000				CODES SEGMENT
+				    ASSUME CS:CODES,DS:DATAS,SS:STACKS
+ 0000				START:
+ 0000  B8 ---- R		    MOV AX,DATAS
+ 0003  8E D8			    MOV DS,AX
+				    ;从键盘上输入两个数字字符 算出对应的数值
+				    ;例如输入2 6 计算出26
+				    
+				    ;;输入字符放在al
+				    ;mov ah,1
+				    ;int 21h
+				    ;
+				    ;sub al,48
+				    ;mov bl,al
+				    ;mov al,0
+				    ;mov cl,10
+				    ;mul cl
+				    ;add al,bl
+				    ;mov ch,al
+				    ;;输出2
+				    ;;mov dl,ch
+				    ;;mov ah,2
+				    ;;int 21h
+				    ;
+				    ;mov ah,1
+				    ;int 21h
+				    ;sub al,48
+				    ;mov bh,al
+				    ;mov al,ch
+				    ;mov cl,10
+				    ;mul cl
+				    ;add al,bh
+				    ;;输出26
+				    ;;mov dl,al
+				    ;;mov ah,2
+				    ;;int 21h
+				    
+				    ;最终结果初始化
+ 0005  B2 00			    mov dl,0
+				    
+				    ;输入字符 放在al    
+ 0007  B4 01			    mov ah,1
+ 0009  CD 21			    int 21h
+				    
+				    ;从ASCII转换为对应数字
+ 000B  2C 30			    sub al,'0'
+				    ;暂存对应数字
+ 000D  8A F0			 	mov dh,al
+				 	;最终结果乘10
+ 000F  8A C2			 	mov al,dl
+ 0011  B1 0A			    mov cl,10
+ 0013  F6 E1			    mul cl
+ 0015  02 C6			    add al,dh
+				    ;将计算结果放回到最终结果
+ 0017  8A D0			    mov dl,al
+				    
+				    ;逻辑同上
+ 0019  B4 01			    mov ah,1
+ 001B  CD 21			    int 21h
+				    
+ 001D  2C 30			    sub al,'0'
+				    
+ 001F  8A F0			    mov dh,al
+ 0021  8A C2			    mov al,dl
+ 0023  B1 0A			    mov cl,10
+ 0025  F6 E1			    mul cl
+ 0027  02 C6			    add al,dh
+ 0029  8A D0			    mov dl,al
+				    
+ 002B  B4 02			    mov ah,2
+ 002D  CD 21			    int 21h
+				    
+ 002F  B4 4C			    MOV AH,4CH
+ 0031  CD 21			    INT 21H
+ 0033				CODES ENDS
+				    END START
+
+
+
+
+Microsoft (R) Macro Assembler Version 6.11		    09/03/22 15:21:42
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+CODES  . . . . . . . . . . . . .	16 Bit	 0033	  Para	  Private 
+DATAS  . . . . . . . . . . . . .	16 Bit	 0000	  Para	  Private 
+STACKS . . . . . . . . . . . . .	16 Bit	 0000	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+START  . . . . . . . . . . . . .	L Near	 0000	  CODES	
+
+	   0 Warnings
+	   0 Errors

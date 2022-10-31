@@ -1,0 +1,142 @@
+Microsoft (R) Macro Assembler Version 6.11		    10/05/22 11:52:41
+tempfile.asm						     Page 1 - 1
+
+
+ 0000				datas segment
+ 0000 05			    buffer db 5
+ 0001  00			           db ?
+ 0002  0005 [			           db 5 dup('$')
+        24
+       ]
+
+ 0007 0D 0A 24			    CRLF   db 13, 10, '$'
+ 000A				datas ends
+
+ 0000				stacks segment
+
+ 0000				stacks ends
+
+ 0000				codes segment
+				            ASSUME ds:datas, cs:codes, ss:stacks
+ 0000				    START:  
+ 0000  B8 ---- R		            mov    ax, datas
+ 0003  8E D8			            mov    ds, ax
+
+
+ 0005  8D 16 0000 R		            lea    dx, buffer                       ;
+ 0009  B4 0A			            mov    ah, 0ah
+ 000B  CD 21			            int    21H
+
+ 000D  8D 16 0007 R		            lea    dx, CRLF
+ 0011  B4 09			            mov    ah, 09h
+ 0013  CD 21			            int    21H
+
+ 0015  8D 3E 0001 R		            lea    di, buffer + 1
+ 0019  8B 0D			            mov    cx, [di]
+ 001B  B5 00			            mov    ch, 0
+				    ;mov cx, [dx] ;get the number of buffer
+ 001D  83 C7 01			            add    di, 1
+				    ; put di in the first charter
+				    ; put the answer in bx
+ 0020  BB 0000			            mov    bx, 0
+ 0023  B2 0A			            mov    dl, 10
+ 0025				    mulLoop:
+				        	
+ 0025  8B C3			            mov    ax, bx
+ 0027  F6 E2			            mul    dl
+							
+ 0029  8B 1D			            mov    bx, [di]
+ 002B  B7 00			            mov    bh, 0
+ 002D  83 C7 01			            add    di, 1
+ 0030  80 EB 30			            sub    bl, '0'
+							
+ 0033  03 D8			            add    bx, ax
+				        	
+ 0035  49			            dec    cx
+ 0036  83 F9 00			            cmp    cx, 0
+ 0039  75 EA			            jnz    mulLoop
+				        	
+ 003B  8B C3			            mov    ax, bx
+ 003D  E8 0004			            call   output
+				        	
+ 0040  B4 4C			            mov    ah, 4ch
+ 0042  CD 21			            int    21h
+				        
+ 0044				output proc
+				    ;ѹջ
+ 0044  52			            push   dx
+ 0045  51			            push   cx
+ 0046  53			            push   bx
+ 0047  B3 00			            mov    bl, 0
+ 0049  B1 0A			            mov    cl, 10
+ 004B				    bbegin: 
+ 004B  B4 00			            mov    ah, 0                            ; �����Ǹ�ah��ֵΪ0
+ 004D  F6 F1			            div    cl
+ 004F  50			            push   ax                               ;ѹջ
+ 0050  FE C3			            inc    bl
+
+ 0052  3C 00			            cmp    al, 0
+ 0054  75 F5			            jnz    bbegin
+					
+ 0056				    aa:     
+ 0056  5A			            pop    dx
+ 0057  8A D6			            mov    dl, dh
+ 0059  80 C2 30			            add    dl, '0'
+ 005C  B4 02			            mov    ah, 2
+ 005E  CD 21			            int    21h
+ 0060  FE CB			            dec    bl
+					
+ 0062  83 FB 00			            cmp    bx, 0
+ 0065  75 EF			            jnz    aa
+					
+					
+ 0067  5B			            pop    bx
+ 0068  59			            pop    cx
+ 0069  5A			            pop    dx
+ 006A  C3			            ret
+ 006B				output endp
+				        
+				        
+				        
+				        
+
+ 006B				codes ends
+				    end START
+
+
+
+Microsoft (R) Macro Assembler Version 6.11		    10/05/22 11:52:41
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+codes  . . . . . . . . . . . . .	16 Bit	 006B	  Para	  Private 
+datas  . . . . . . . . . . . . .	16 Bit	 000A	  Para	  Private 
+stacks . . . . . . . . . . . . .	16 Bit	 0000	  Para	  Private 
+
+
+Procedures,  parameters and locals:
+
+                N a m e                 Type     Value    Attr
+
+output . . . . . . . . . . . . .	P Near	 0044	  codes	Length= 0027 Public
+  bbegin . . . . . . . . . . . .	L Near	 004B	  codes	
+  aa . . . . . . . . . . . . . .	L Near	 0056	  codes	
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+CRLF . . . . . . . . . . . . . .	Byte	 0007	  datas	
+START  . . . . . . . . . . . . .	L Near	 0000	  codes	
+buffer . . . . . . . . . . . . .	Byte	 0000	  datas	
+mulLoop  . . . . . . . . . . . .	L Near	 0025	  codes	
+
+	   0 Warnings
+	   0 Errors

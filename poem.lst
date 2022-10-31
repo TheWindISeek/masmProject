@@ -1,0 +1,80 @@
+Microsoft (R) Macro Assembler Version 6.11		    10/08/22 18:14:40
+tempfile.asm						     Page 1 - 1
+
+
+				assume cs:code
+
+ 0000				code segment
+ 0000 47 6F 6F 64 2C 20		    s1 db 'Good, better, best', '$'
+       62 65 74 74 65 72
+       2C 20 62 65 73 74
+       24
+ 0013 4E 65 76 65 72 20		    s2 db 'Never let it rest,', '$'
+       6C 65 74 20 69 74
+       20 72 65 73 74 2C
+       24
+ 0026 54 69 6C 6C 20 67		    s3 db 'Till good is better,', '$'
+       6F 6F 64 20 69 73
+       20 62 65 74 74 65
+       72 2C 24
+ 003B 41 6E 64 20 62 65		    s4 db 'And better is best.', '$'
+       74 74 65 72 20 69
+       73 20 62 65 73 74
+       2E 24
+ 004F 0000 R 0013 R 0026 R	    s  dw offset s1, offset s2, offset s3, offset s4
+       003B R
+ 0057 02 04 06 08		    row db 2, 4, 6, 8
+
+ 005B				    start:
+ 005B  8C C8			        mov ax, cs
+ 005D  8E D8			        mov ds, ax
+ 005F  BB 004F R		        mov bx, offset s
+ 0062  BE 0057 R		        mov si, offset row
+ 0065  B9 0004			        mov cx, 4
+				        
+				        
+ 0068  B7 00			        ok:mov bh, 0
+ 006A  8A 34			        mov dh, [si]
+ 006C  B2 00			        mov dl, 0
+ 006E  B4 02			        mov ah, 2
+ 0070  CD 10			        int 10h
+
+ 0072  8B 17			        mov dx, [bx]
+ 0074  B4 09			        mov ah, 9
+ 0076  CD 21			        int 21h
+ 0078  83 C6 01			        add si, 1
+ 007B  83 C3 02			        add bx, 2       
+ 007E  E2 E8			        loop ok
+				        
+ 0080  B8 4C00			        mov ax, 4c00h
+ 0083  CD 21			        int 21h
+ 0085				code ends
+				end start
+Microsoft (R) Macro Assembler Version 6.11		    10/08/22 18:14:40
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+code . . . . . . . . . . . . . .	16 Bit	 0085	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+ok . . . . . . . . . . . . . . .	L Near	 0068	  code	
+row  . . . . . . . . . . . . . .	Byte	 0057	  code	
+s1 . . . . . . . . . . . . . . .	Byte	 0000	  code	
+s2 . . . . . . . . . . . . . . .	Byte	 0013	  code	
+s3 . . . . . . . . . . . . . . .	Byte	 0026	  code	
+s4 . . . . . . . . . . . . . . .	Byte	 003B	  code	
+start  . . . . . . . . . . . . .	L Near	 005B	  code	
+s  . . . . . . . . . . . . . . .	Word	 004F	  code	
+
+	   0 Warnings
+	   0 Errors

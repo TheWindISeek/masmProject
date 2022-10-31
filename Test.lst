@@ -1,0 +1,116 @@
+Microsoft (R) Macro Assembler Version 6.11		    10/08/22 17:17:17
+tempfile.asm						     Page 1 - 1
+
+
+				assume cs:code, ss:stacks, ds:datas
+
+ 0000				datas segment
+ 0000  0020 [			    db 32 dup(0)
+        00
+       ]
+ 0020				datas ends
+
+ 0000				stacks segment
+ 0000  0020 [			    db 32 dup(0)
+        00
+       ]
+ 0020				stacks ends
+
+ 0000				code segment
+ 0000				    interruptProgram:
+ 0000  50			    push ax
+ 0001  51			    push cx
+ 0002  06			    push es
+ 0003  57			    push di
+ 0004  56			    push si
+				    ;;;;;;;;;;;;;;;;;;
+ 0005  EB 09			    jmp endShowString
+ 0007 6F 76 65 72 66 6C		    showString db "overflow!"
+       6F 77 21
+ 0010  90			    endShowString:nop
+ 0011  B8 B800			    mov ax, 0b800h
+ 0014  8E C0			    mov es, ax
+ 0016  BF 07C8			    mov di, 12*160+36*2
+ 0019  8D 36 0007 R			lea si, showString
+ 001D  B9 0009			    mov cx, offset endShowString - offset showString
+ 0020  8A 04			    movStringLoop:mov al, [si]
+ 0022  26: 88 05		    mov es:[di], al
+ 0025  46			    inc si
+ 0026  83 C7 02			    add di, 2
+ 0029  E2 F5			    loop movStringLoop
+ 002B  B2 39			    mov dl, '9'
+ 002D  B4 02			    mov ah, 2
+ 002F  CD 21			    int 21h
+				    ;;;;;;;;;;;;;;;;;;
+ 0031  5E			    pop si
+ 0032  5F			    pop di
+ 0033  07			    pop es
+ 0034  59			    pop cx
+ 0035  58			    pop ax
+ 0036  B4 4C			    mov ah, 4ch
+ 0038  CD 21			    int 21h
+ 003A  CF			    iret 
+ 003B				    start:
+				    ;code interrupt program 
+				    ;set up interrupt program
+				    ;alter 0000:0(ip) 0000:2(cs)
+				    ;make interrupt
+				    ;return 
+ 003B				    setupInterruptProgram:
+				    ;choose ip and cs
+ 003B  8C C8			    mov ax, cs
+ 003D  8E D8			    mov ds, ax
+ 003F  BE 0000 R		    mov si, offset interruptProgram
+				    ;get program cs:ip
+ 0042  B8 0000			    mov ax, 0
+ 0045  8E C0			    mov es, ax
+ 0047  BF 0200			    mov di, 200h
+				    ;set source cs:ip = 0000:0200h
+ 004A  B9 003B			    mov cx, offset start - offset interruptProgram
+				    ;program size
+ 004D  FC			    cld
+ 004E  F3/ A4			    rep movsb;-> by byte
+				    ;alter interrupt table
+ 0050  B8 0000			    mov ax, 0
+ 0053  8E C0			    mov es, ax
+ 0055  BF 0000			    mov di, 0
+ 0058  26: C7 05 0200		    mov es:[di], word ptr 200h
+ 005D  26: C7 45 02 0000	    mov es:[di+2], word ptr 0h
+				    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 0063  B8 1000			    mov ax, 1000h
+ 0066  B3 01			    mov bl, 1
+ 0068  F6 F3			    div bl
+				    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 006A  B4 4C			    mov ah, 4ch
+ 006C  CD 21			    int 21h
+ 006E				code ends
+
+				end start
+Microsoft (R) Macro Assembler Version 6.11		    10/08/22 17:17:17
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+code . . . . . . . . . . . . . .	16 Bit	 006E	  Para	  Private 
+datas  . . . . . . . . . . . . .	16 Bit	 0020	  Para	  Private 
+stacks . . . . . . . . . . . . .	16 Bit	 0020	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+endShowString  . . . . . . . . .	L Near	 0010	  code	
+interruptProgram . . . . . . . .	L Near	 0000	  code	
+movStringLoop  . . . . . . . . .	L Near	 0020	  code	
+setupInterruptProgram  . . . . .	L Near	 003B	  code	
+showString . . . . . . . . . . .	Byte	 0007	  code	
+start  . . . . . . . . . . . . .	L Near	 003B	  code	
+
+	   0 Warnings
+	   0 Errors
